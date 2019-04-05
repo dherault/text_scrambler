@@ -1,0 +1,29 @@
+{
+  "name": "text_scrambler",
+  "version": "0.0.0",
+  "description": "Genetically-generated text scrambling algorithms",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dherault/text_scrambler.git"
+  },
+  "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dherault/text_scrambler/issues"
+  },
+  "homepage": "https://github.com/dherault/text_scrambler#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2"
+  },
+  "dependencies": {
+    "js-levenshtein": "^1.1.6"
+  }
+}
