@@ -2,10 +2,7 @@ const characters = require('./characters')
 const computeStringScore = require('./computeStringScore')
 const { randomRange, randomArray } = require('./utils')
 
-class ScramblerPart {
-}
-
-class CharactersAdderScramblerPart extends ScramblerPart {
+class CharactersAdderScramblerPart {
   constructor(config) {
     super()
 
@@ -41,7 +38,7 @@ class CharactersAdderScramblerPart extends ScramblerPart {
   }
 }
 
-class CharacterSwitcherScramblerPart extends ScramblerPart {
+class CharacterSwitcherScramblerPart {
   constructor(config) {
     super()
 
