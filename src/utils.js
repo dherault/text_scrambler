@@ -10,13 +10,31 @@ function randomPop(array) {
   return array.splice(Math.floor(Math.random() * array.length), 1)[0]
 }
 
-function distortString(string, offset, characters) {
-  return string.split('').map(char => character[characters.indexOf(char) + offset] || characters[0]).join('')
+function computeStringEntropy(string) {
+  const occurences = {}
+  const l = string.length
+
+  for (const char of string) {
+    if (typeof occurences[char] === 'undefined') {
+      occurences[char] = 1
+    }
+    else {
+      occurences[char]++
+    }
+  }
+
+  let h = 0
+
+  Object.values(occurences).forEach(occurence => {
+    h -= occurence / l * Math.log2(occurence / l)
+  })
+
+  return h
 }
 
 module.exports = {
   randomRange,
   randomArray,
   randomPop,
-  distortString,
+  computeStringEntropy,
 }

@@ -1,11 +1,8 @@
+const { randomRange } = require('./utils')
 const characters = require('./characters')
-const computeStringScore = require('./computeStringScore')
-const { randomRange, randomArray } = require('./utils')
 
 class CharactersAdderScramblerPart {
   constructor(config) {
-    super()
-
     this.seed = randomRange(-config.minimumPasswordLength + 1, 10)
   }
 
@@ -38,10 +35,8 @@ class CharactersAdderScramblerPart {
   }
 }
 
-class CharacterSwitcherScramblerPart {
+class CharacterSwapperScramblerPart {
   constructor(config) {
-    super()
-
     this.tuples = []
     this.minimumStringLength = config.minimumStringLength
     this.offset1 = randomRange(1, 10)
@@ -110,18 +105,73 @@ class CharacterSwitcherScramblerPart {
   }
 }
 
-function printDependencies() {
-  return `
-  const dependencies = {
-    randomRange: ${randomRange},
-    randomArray: ${randomArray},
-    characters: ${JSON.stringify(characters)},
-  };
-  `
+class InverseStringScramblerPart {
+  toEncoderString(functionName) {
+    return  `
+    function ${functionName}(dependencies, string, password) {
+      return string.split('').reverse().join('')
+    }
+    `
+  }
+
+  toDecoderString(functionName) {
+    return this.toEncoderString(functionName)
+  }
 }
 
-module.exports = {
-  CharactersAdderScramblerPart,
-  CharacterSwitcherScramblerPart,
-  printDependencies,
+class CharacterOffseterScramblerPart {
+
+  constructor() {
+    // this.seed = characters.length
+    this.seed = randomRange(0, characters.length - 1)
+  }
+
+  toEncoderString(functionName) {
+    return  `
+    function ${functionName}(dependencies, string, password) {
+      const passwordOffsets = password.split('').map(char => dependencies.characters.indexOf(char))
+
+      return string
+      .split('')
+      .map((char, i) => {
+        const offset = ${this.seed} + passwordOffsets[i % (passwordOffsets.length - 1)]
+        let offsetedIndex = dependencies.characters.indexOf(char) + offset
+
+        if (offsetedIndex >= dependencies.characters.length) offsetedIndex %= dependencies.characters.length
+
+        return dependencies.characters[offsetedIndex]
+      })
+      .join('')
+    }
+    `
+  }
+
+  toDecoderString(functionName) {
+    return  `
+    function ${functionName}(dependencies, string, password) {
+      const l = dependencies.characters.length
+      const passwordOffsets = password.split('').map(char => dependencies.characters.indexOf(char))
+
+      return string
+      .split('')
+      .map((char, i) => {
+        const offset = ${this.seed} + passwordOffsets[i % (passwordOffsets.length - 1)]
+        let offsetedIndex = dependencies.characters.indexOf(char) - offset
+
+        if (offsetedIndex >= dependencies.characters.length) offsetedIndex %= dependencies.characters.length
+        if (offsetedIndex < 0) offsetedIndex = dependencies.characters.length + offsetedIndex % dependencies.characters.length
+
+        return dependencies.characters[offsetedIndex]
+      })
+      .join('')
+    }
+    `
+  }
 }
+
+module.exports = [
+  CharactersAdderScramblerPart,
+  CharacterSwapperScramblerPart,
+  InverseStringScramblerPart,
+  // CharacterOffseterScramblerPart,
+]
