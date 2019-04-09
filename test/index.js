@@ -24,6 +24,10 @@ function cleanupTmpDirectory() {
 
 const dependenciesString = printDependencies()
 
+if (!fs.existsSync(tmpDirectory)) {
+  fs.mkdirSync(tmpDirectory)
+}
+
 describe('computeStringEntropy', () => {
 
   it('should return a number', () => {

@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "js-beautify": "^1.9.1",
-    "js-levenshtein": "^1.1.6"
+    "js-levenshtein": "^1.1.6",
+    "tmp": "^0.1.0"
   }
 }

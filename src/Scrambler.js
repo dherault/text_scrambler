@@ -2,8 +2,11 @@ const beautify = require('js-beautify').js
 const printDependencies = require('./printDependencies')
 const { randomArray } = require('./utils')
 
+let id = 0
+
 class Scrambler {
   constructor() {
+    this.id = id++
     this.scramblerParts = []
   }
 
@@ -40,11 +43,11 @@ class Scrambler {
     })
   }
 
-  toDecoderString() {
+  toDecoderString(shouldPrintDependencies) {
     const decodeFunctionNames = this.scramblerParts.map((scramblerPart, i) => `decode${i + 1}`)
 
     const decoderFileContent = `
-    ${printDependencies()}
+    ${shouldPrintDependencies ? printDependencies() : ''}
     ${this.scramblerParts.map((scramblerPart, i) => scramblerPart.toDecoderString(decodeFunctionNames[i])).join('\n')}
     function decode(string, password) {
       let decodedString = string
