@@ -5,7 +5,7 @@ const levenshtein = require('js-levenshtein')
 const Scrambler = require('./Scrambler')
 const scramblerParts = require('./ScramblerPart')
 const characters = require('./characters')
-const { randomArray, randomPop, randomRange, computeStringEntropy } = require('./utils')
+const { randomArray, randomPop, randomRange, computeStringEntropy } = require('./utils').default
 
 const scramblerDiversity = {}
 
@@ -72,7 +72,7 @@ function evolve(config, scramblers) {
     }
 
     // Randomize scramblerParts order
-    child.scramblerParts.sort((a, b) => Math.random() > 0.5 ? -1 : 1)
+    child.scramblerParts.sort(() => Math.random() > 0.5 ? -1 : 1)
 
     // Mutate child
     const mutations = []
@@ -84,7 +84,6 @@ function evolve(config, scramblers) {
     }
 
     const indexes = child.scramblerParts.map((scramblerPart, i) => i)
-    const mutationIndexes = []
 
     mutations.forEach(mutation => {
       const index = randomPop(indexes)
@@ -120,6 +119,8 @@ function addScoreToScramblers(scramblers) {
     console.log(encode(string, password))
     `)
 
+    // console.log(scrambler)
+    // console.log('executing', `node ${file.name}`)
     const encodedString = execSync(`node ${file.name}`).toString()
 
     const scramblerPartTypes = new Set()

@@ -32,9 +32,14 @@ function computeStringEntropy(string) {
   return h
 }
 
+function computeStringScore(dependencies, string) {
+  return string.split('').map((char, i) => i * dependencies.characters.indexOf(char)).reduce((a, b) => a + b, 0)
+}
+
 module.exports = {
   randomRange,
   randomArray,
   randomPop,
   computeStringEntropy,
+  computeStringScore,
 }

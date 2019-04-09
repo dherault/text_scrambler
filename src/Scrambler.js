@@ -1,6 +1,6 @@
 const beautify = require('js-beautify').js
 const printDependencies = require('./printDependencies')
-const { randomArray } = require('./utils')
+const { randomArray } = require('./utils').default
 
 let id = 0
 
@@ -37,7 +37,6 @@ class Scrambler {
     module.exports = encode
     `
 
-
     return beautify(encoderFileContent.replace(/\n\n/gm, '\n'), {
       indent_size: 2,
     })
@@ -61,7 +60,6 @@ class Scrambler {
 
     module.exports = decode
     `
-
 
     return beautify(decoderFileContent.replace(/\n\n/gm, '\n'), {
       indent_size: 2,

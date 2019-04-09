@@ -1,12 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
-const { describe, it, beforeEach } = require('mocha')
+const { describe, it } = require('mocha')
 const { expect } = require('chai')
 
 const strings = require('./data/strings')
 
-const { computeStringEntropy } = require('../src/utils')
+const { computeStringEntropy } = require('../src/utils').default
 const printDependencies = require('../src/printDependencies')
 const Scrambler = require('../src/Scrambler')
 const scramblerParts = require('../src/ScramblerPart')
@@ -17,8 +17,9 @@ const tmpDirectory = path.join(__dirname, 'tmp')
 function cleanupTmpDirectory() {
   const files = fs.readdirSync(tmpDirectory)
 
+  // eslint-disable-next-line
   for (const file of files) {
-    fs.unlinkSync(path.join(tmpDirectory, file));
+    fs.unlinkSync(path.join(tmpDirectory, file))
   }
 }
 
@@ -37,6 +38,7 @@ describe('computeStringEntropy', () => {
   })
 
   it('should be consistant', () => {
+    // eslint-disable-next-line
     expect(computeStringEntropy('a') === computeStringEntropy('a'))
     expect(computeStringEntropy('a') === computeStringEntropy('b'))
     expect(computeStringEntropy('ab') === computeStringEntropy('ba'))

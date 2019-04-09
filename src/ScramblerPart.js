@@ -1,15 +1,13 @@
-const { randomRange } = require('./utils')
+const { randomRange } = require('./utils').default
 const characters = require('./characters')
 
 class CharactersAdderScramblerPart {
-  constructor(config) {
-    this.seed = randomRange(-config.minimumPasswordLength + 1, 10)
-  }
 
   toEncoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      const step = ${this.seed} + password.length
+      const score = dependencies.computeStringScore(dependencies, password).toString()
+      const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
 
       for (let i = 0; i < string.length; i += step) {
         string = string.slice(0, i) + dependencies.randomArray(dependencies.characters) + string.slice(i)
@@ -23,7 +21,8 @@ class CharactersAdderScramblerPart {
   toDecoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      const step = ${this.seed} + password.length
+      const score = dependencies.computeStringScore(dependencies, password).toString()
+      const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
 
       for (let i = 0; i < string.length; i += step - 1) {
         string = string.slice(0, i) + string.slice(i + 1)
@@ -147,7 +146,7 @@ class CharacterOffseterScramblerPart {
   }
 
   toDecoderString(functionName) {
-    return  `
+    return `
     function ${functionName}(dependencies, string, password) {
       const l = dependencies.characters.length
       const passwordOffsets = password.split('').map(char => dependencies.characters.indexOf(char))

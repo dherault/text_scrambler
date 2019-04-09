@@ -1,5 +1,5 @@
 const characters = require('./characters')
-const { randomRange, randomArray, computeStringScore } = require('./utils')
+const { randomRange, randomArray, computeStringScore } = require('./utils').default
 
 function printDependencies() {
   return `
