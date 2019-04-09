@@ -17,7 +17,7 @@ const scrambler = tournament({
   reproductionParentsCount: 3,
   reproductionChildrenCount: 6,
   mutationFactor: 0.33,
-  generationsCount: 10,
+  generationsCount: 20,
 })
 
 console.log(scrambler)
@@ -32,18 +32,23 @@ ${scrambler.toEncoderString()}
 ${scrambler.toDecoderString(false)}
 
 const string = ${JSON.stringify(testString)}
-const password = ${JSON.stringify(testPassword)}
-const encoded = encode(string, password)
+const cipher = ${JSON.stringify(testPassword)}
+const encoded = encode(string, cipher)
 console.log(encoded)
 
+console.log()
 console.log('password123')
 console.log(decode(encoded, 'password123'))
+console.log()
 console.log('password120')
 console.log(decode(encoded, 'password120'))
+console.log()
 console.log('password000')
 console.log(decode(encoded, 'password000'))
+console.log()
 console.log('321drowssap')
 console.log(decode(encoded, '321drowssap'))
+console.log()
 console.log('01234567890')
 console.log(decode(encoded, '01234567890'))
 `)

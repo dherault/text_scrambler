@@ -1,6 +1,6 @@
 const beautify = require('js-beautify').js
 const printDependencies = require('./printDependencies')
-const { randomArray } = require('./utils').default
+const { randomArray } = require('./utils')
 
 let id = 0
 
@@ -24,11 +24,11 @@ class Scrambler {
     const encoderFileContent = `
     ${printDependencies()}
     ${this.scramblerParts.map((scramblerPart, i) => scramblerPart.toEncoderString(encodeFunctionNames[i])).join('\n')}
-    function encode(string, password) {
+    function encode(string, cipher) {
       let encodedString = string
 
       ${encodeFunctionNames.map(functionName => `
-        encodedString = ${functionName}(dependencies, encodedString, password)
+        encodedString = ${functionName}(dependencies, encodedString, cipher)
       `).join('')}
 
       return encodedString
@@ -48,11 +48,11 @@ class Scrambler {
     const decoderFileContent = `
     ${shouldPrintDependencies ? printDependencies() : ''}
     ${this.scramblerParts.map((scramblerPart, i) => scramblerPart.toDecoderString(decodeFunctionNames[i])).join('\n')}
-    function decode(string, password) {
+    function decode(string, cipher) {
       let decodedString = string
 
       ${decodeFunctionNames.reverse().map(functionName => `
-        decodedString = ${functionName}(dependencies, decodedString, password)
+        decodedString = ${functionName}(dependencies, decodedString, cipher)
       `).join('')}
 
       return decodedString

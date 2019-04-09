@@ -6,7 +6,7 @@ const { expect } = require('chai')
 
 const strings = require('./data/strings')
 
-const { computeStringEntropy } = require('../src/utils').default
+const { computeStringEntropy } = require('../src/utils')
 const printDependencies = require('../src/printDependencies')
 const Scrambler = require('../src/Scrambler')
 const scramblerParts = require('../src/ScramblerPart')
@@ -47,17 +47,17 @@ describe('computeStringEntropy', () => {
   })
 })
 
-describe('ScramblerPart', () => {
+describe.only('ScramblerPart', () => {
 
   const config = {
     minimumPasswordLength: 5,
   }
 
-  const password = 'password'
+  const cipher = 'cipher'
 
   scramblerParts.forEach(ScramblerPart => {
     describe(ScramblerPart.name, () => {
-      it('should encore and decode a string given a password', () => {
+      it('should encore and decode a string given a cipher', () => {
 
         for (let i = 0; i < strings.length; i++) {
           for (let j = 0; j < 10; j++) {
@@ -67,7 +67,7 @@ describe('ScramblerPart', () => {
 
             const fileContent = `
             ${dependenciesString}
-            const password = ${JSON.stringify(password)}
+            const cipher = ${JSON.stringify(cipher)}
             const string = ${JSON.stringify(string)}
             for (const char of string) {
               if (!dependencies.characters.includes(char)) {
@@ -76,8 +76,8 @@ describe('ScramblerPart', () => {
             }
             ${scramblerPart.toEncoderString('encode')}
             ${scramblerPart.toDecoderString('decode')}
-            const encodedString = encode(dependencies, string, password)
-            const decodedString = decode(dependencies, encodedString, password)
+            const encodedString = encode(dependencies, string, cipher)
+            const decodedString = decode(dependencies, encodedString, cipher)
             console.log(decodedString)
             `
 
@@ -88,9 +88,9 @@ describe('ScramblerPart', () => {
 
             const output = execSync(`node ${file}`).toString().slice(0, -1)
 
-            expect(output).to.be.equal(string)
-
             cleanupTmpDirectory()
+
+            expect(output).to.be.equal(string)
           }
         }
       })
@@ -104,7 +104,7 @@ describe('Scrambler', () => {
     minimumPasswordLength: 5,
   }
 
-  const password = 'password'
+  const cipher = 'cipher'
 
   it('should encode and decode a string', () => {
 
@@ -135,10 +135,10 @@ describe('Scrambler', () => {
       const decode = require('./${decoderFileName}')
 
       const string = ${JSON.stringify(string)}
-      const password = ${JSON.stringify(password)}
+      const cipher = ${JSON.stringify(cipher)}
 
-      const encodedString = encode(string, password)
-      const decodedString = decode(encodedString, password)
+      const encodedString = encode(string, cipher)
+      const decodedString = decode(encodedString, cipher)
 
       console.log(decodedString)
       `

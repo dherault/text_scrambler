@@ -1,12 +1,12 @@
-const { randomRange } = require('./utils').default
+const { randomRange } = require('./utils')
 const characters = require('./characters')
 
 class CharactersAdderScramblerPart {
 
   toEncoderString(functionName) {
     return `
-    function ${functionName}(dependencies, string, password) {
-      const score = dependencies.computeStringScore(dependencies, password).toString()
+    function ${functionName}(dependencies, string, cipher) {
+      const score = dependencies.computeStringScore(dependencies, cipher).toString()
       const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
 
       for (let i = 0; i < string.length; i += step) {
@@ -20,8 +20,8 @@ class CharactersAdderScramblerPart {
 
   toDecoderString(functionName) {
     return `
-    function ${functionName}(dependencies, string, password) {
-      const score = dependencies.computeStringScore(dependencies, password).toString()
+    function ${functionName}(dependencies, string, cipher) {
+      const score = dependencies.computeStringScore(dependencies, cipher).toString()
       const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
 
       for (let i = 0; i < string.length; i += step - 1) {
@@ -52,7 +52,7 @@ class CharacterSwapperScramblerPart {
   writeFinalTuples() {
     return `
     const masterTuples = ${JSON.stringify(this.tuples)}
-    const passwordIndexes = password.split('').map(char => dependencies.characters.indexOf(char))
+    const passwordIndexes = cipher.split('').map(char => dependencies.characters.indexOf(char))
     const minPasswordIndex = Math.min(...passwordIndexes)
     const tuplesIndexes = [...(new Set(passwordIndexes.map(index => index - minPasswordIndex)))]
     const tuples = tuplesIndexes.map(index => masterTuples[index]).filter(tuple => tuple)
@@ -69,7 +69,7 @@ class CharacterSwapperScramblerPart {
 
   toEncoderString(functionName) {
     return `
-    function ${functionName}(dependencies, string, password) {
+    function ${functionName}(dependencies, string, cipher) {
       ${this.writeFinalTuples()}
 
       const array = string.split('')
@@ -87,7 +87,7 @@ class CharacterSwapperScramblerPart {
 
   toDecoderString(functionName) {
     return  `
-    function ${functionName}(dependencies, string, password) {
+    function ${functionName}(dependencies, string, cipher) {
       ${this.writeFinalTuples()}
 
       const array = string.split('')
@@ -107,8 +107,31 @@ class CharacterSwapperScramblerPart {
 class InverseStringScramblerPart {
   toEncoderString(functionName) {
     return  `
-    function ${functionName}(dependencies, string, password) {
+    function ${functionName}(dependencies, string, cipher) {
       return string.split('').reverse().join('')
+    }
+    `
+  }
+
+  toDecoderString(functionName) {
+    return this.toEncoderString(functionName)
+  }
+}
+
+class InverseStringFromMiddleScramblerPart {
+  toEncoderString(functionName) {
+    return  `
+    function ${functionName}(dependencies, string, cipher) {
+      const array = string.split('')
+      const middle = Math.floor(array.length / 2)
+      const score = dependencies.computeStringScore(dependencies, cipher).toString()
+      const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
+
+      for (let i = Math.floor(array.length / 2); i >= 0; i -= step) {
+        [array[i], array[array.length - i]] = [array[array.length - i], array[i]]
+      }
+
+      return array.join('')
     }
     `
   }
@@ -121,14 +144,14 @@ class InverseStringScramblerPart {
 class CharacterOffseterScramblerPart {
 
   constructor() {
-    // this.seed = characters.length
     this.seed = randomRange(0, characters.length - 1)
   }
 
   toEncoderString(functionName) {
     return  `
-    function ${functionName}(dependencies, string, password) {
-      const passwordOffsets = password.split('').map(char => dependencies.characters.indexOf(char))
+    function ${functionName}(dependencies, string, cipher) {
+      const l = dependencies.characters.length
+      const passwordOffsets = cipher.split('').map(char => dependencies.characters.indexOf(char))
 
       return string
       .split('')
@@ -136,7 +159,7 @@ class CharacterOffseterScramblerPart {
         const offset = ${this.seed} + passwordOffsets[i % (passwordOffsets.length - 1)]
         let offsetedIndex = dependencies.characters.indexOf(char) + offset
 
-        if (offsetedIndex >= dependencies.characters.length) offsetedIndex %= dependencies.characters.length
+        if (offsetedIndex >= l) offsetedIndex %= l
 
         return dependencies.characters[offsetedIndex]
       })
@@ -147,9 +170,9 @@ class CharacterOffseterScramblerPart {
 
   toDecoderString(functionName) {
     return `
-    function ${functionName}(dependencies, string, password) {
+    function ${functionName}(dependencies, string, cipher) {
       const l = dependencies.characters.length
-      const passwordOffsets = password.split('').map(char => dependencies.characters.indexOf(char))
+      const passwordOffsets = cipher.split('').map(char => dependencies.characters.indexOf(char))
 
       return string
       .split('')
@@ -157,8 +180,8 @@ class CharacterOffseterScramblerPart {
         const offset = ${this.seed} + passwordOffsets[i % (passwordOffsets.length - 1)]
         let offsetedIndex = dependencies.characters.indexOf(char) - offset
 
-        if (offsetedIndex >= dependencies.characters.length) offsetedIndex %= dependencies.characters.length
-        if (offsetedIndex < 0) offsetedIndex = dependencies.characters.length + offsetedIndex % dependencies.characters.length
+        if (offsetedIndex < 0) offsetedIndex = l + offsetedIndex % l
+        if (offsetedIndex >= l) offsetedIndex %= l
 
         return dependencies.characters[offsetedIndex]
       })
@@ -172,5 +195,6 @@ module.exports = [
   CharactersAdderScramblerPart,
   CharacterSwapperScramblerPart,
   InverseStringScramblerPart,
-  // CharacterOffseterScramblerPart,
+  InverseStringFromMiddleScramblerPart,
+  CharacterOffseterScramblerPart,
 ]

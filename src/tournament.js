@@ -5,7 +5,7 @@ const levenshtein = require('js-levenshtein')
 const Scrambler = require('./Scrambler')
 const scramblerParts = require('./ScramblerPart')
 const characters = require('./characters')
-const { randomArray, randomPop, randomRange, computeStringEntropy } = require('./utils').default
+const { randomArray, randomPop, randomRange, computeStringEntropy } = require('./utils')
 
 const scramblerDiversity = {}
 
@@ -115,8 +115,8 @@ function addScoreToScramblers(scramblers) {
     ${scrambler.toEncoderString()}
 
     const string = ${JSON.stringify(testString)}
-    const password = ${JSON.stringify(testPassword)}
-    console.log(encode(string, password))
+    const cipher = ${JSON.stringify(testPassword)}
+    console.log(encode(string, cipher))
     `)
 
     // console.log(scrambler)
@@ -126,8 +126,7 @@ function addScoreToScramblers(scramblers) {
     const scramblerPartTypes = new Set()
 
     scrambler.scramblerParts.forEach(scramblerPart => scramblerPartTypes.add(scramblerPart.constructor.name))
-
-    scrambler.score = levenshtein(testString, encodedString) * computeStringEntropy(encodedString) * scramblerPartTypes.size
+    scrambler.score = Math.floor(levenshtein(testString, encodedString) * computeStringEntropy(encodedString) * scramblerPartTypes.size)
     // console.log(encodedString)
     // console.log('levenshtein(testString, encodedString)', levenshtein(testString, encodedString))
     // console.log('computeStringEntropy(encodedString)', computeStringEntropy(encodedString))
