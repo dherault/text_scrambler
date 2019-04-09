@@ -3,7 +3,8 @@ const tournament = require('./tournament')
 tournament({
   minimumStringLength: 10,
   minimumPasswordLength: 8,
-  complexity: 3,
+  complexity: 10,
+  reproductionParentsCount: 3,
+  reproductionChildrenCount: 6,
   mutationFactor: 0.33,
-  reproductionCount: 2,
 })
