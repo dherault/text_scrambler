@@ -24,11 +24,11 @@ class Scrambler {
     const encoderFileContent = `
     ${printDependencies()}
     ${this.scramblerParts.map((scramblerPart, i) => scramblerPart.toEncoderString(encodeFunctionNames[i])).join('\n')}
-    function encode(string, cipher) {
+    function encode(string, password) {
       let encodedString = string
 
       ${encodeFunctionNames.map(functionName => `
-        encodedString = ${functionName}(dependencies, encodedString, cipher)
+        encodedString = ${functionName}(dependencies, encodedString, password)
       `).join('')}
 
       return encodedString
@@ -37,22 +37,20 @@ class Scrambler {
     module.exports = encode
     `
 
-    return beautify(encoderFileContent.replace(/\n\n/gm, '\n'), {
-      indent_size: 2,
-    })
+    return beautify(encoderFileContent.trim(), { indent_size: 2 })
   }
 
-  toDecoderString(shouldPrintDependencies) {
+  toDecoderString(dontPrintDependencies) {
     const decodeFunctionNames = this.scramblerParts.map((scramblerPart, i) => `decode${i + 1}`)
 
     const decoderFileContent = `
-    ${shouldPrintDependencies ? printDependencies() : ''}
+    ${dontPrintDependencies ? '' : printDependencies()}
     ${this.scramblerParts.map((scramblerPart, i) => scramblerPart.toDecoderString(decodeFunctionNames[i])).join('\n')}
-    function decode(string, cipher) {
+    function decode(string, password) {
       let decodedString = string
 
       ${decodeFunctionNames.reverse().map(functionName => `
-        decodedString = ${functionName}(dependencies, decodedString, cipher)
+        decodedString = ${functionName}(dependencies, decodedString, password)
       `).join('')}
 
       return decodedString
@@ -61,9 +59,7 @@ class Scrambler {
     module.exports = decode
     `
 
-    return beautify(decoderFileContent.replace(/\n\n/gm, '\n'), {
-      indent_size: 2,
-    })
+    return beautify(decoderFileContent.trim(), { indent_size: 2 })
   }
 }
 

@@ -10,8 +10,8 @@ const { computeStringEntropy } = require('../src/utils')
 const printDependencies = require('../src/printDependencies')
 const Scrambler = require('../src/Scrambler')
 const scramblerParts = require('../src/ScramblerPart')
+const tournament = require('../src/tournament')
 
-const [CharactersAdderScramblerPart, CharacterSwapperScramblerPart] = scramblerParts
 const tmpDirectory = path.join(__dirname, 'tmp')
 
 function cleanupTmpDirectory() {
@@ -47,27 +47,22 @@ describe('computeStringEntropy', () => {
   })
 })
 
-describe.only('ScramblerPart', () => {
+describe('ScramblerPart', () => {
 
-  const config = {
-    minimumPasswordLength: 5,
-  }
-
-  const cipher = 'cipher'
+  const password = 'password'
 
   scramblerParts.forEach(ScramblerPart => {
     describe(ScramblerPart.name, () => {
-      it('should encore and decode a string given a cipher', () => {
+      it('should encore and decode a string given a password', () => {
 
         for (let i = 0; i < strings.length; i++) {
           for (let j = 0; j < 10; j++) {
             const string = strings[i]
-            const scramblerConfig = Object.assign({ minimumStringLength: string.length }, config)
-            const scramblerPart = new ScramblerPart(scramblerConfig)
+            const scramblerPart = new ScramblerPart()
 
             const fileContent = `
             ${dependenciesString}
-            const cipher = ${JSON.stringify(cipher)}
+            const password = ${JSON.stringify(password)}
             const string = ${JSON.stringify(string)}
             for (const char of string) {
               if (!dependencies.characters.includes(char)) {
@@ -76,8 +71,8 @@ describe.only('ScramblerPart', () => {
             }
             ${scramblerPart.toEncoderString('encode')}
             ${scramblerPart.toDecoderString('decode')}
-            const encodedString = encode(dependencies, string, cipher)
-            const decodedString = decode(dependencies, encodedString, cipher)
+            const encodedString = encode(dependencies, string, password)
+            const decodedString = decode(dependencies, encodedString, password)
             console.log(decodedString)
             `
 
@@ -98,25 +93,19 @@ describe.only('ScramblerPart', () => {
   })
 })
 
-describe('Scrambler', () => {
+describe.only('Scrambler', () => {
 
-  const config = {
-    minimumPasswordLength: 5,
-  }
-
-  const cipher = 'cipher'
+  const password = 'password'
 
   it('should encode and decode a string', () => {
 
     for (let i = 0; i < strings.length; i++) {
       const string = strings[i]
-      const scramblerConfig = Object.assign({ minimumStringLength: string.length }, config)
-      const scramblerPart1 = new CharactersAdderScramblerPart(scramblerConfig)
-      const scramblerPart2 = new CharacterSwapperScramblerPart(scramblerConfig)
       const scrambler = new Scrambler()
 
-      scrambler.addScramblerPart(scramblerPart1)
-      scrambler.addScramblerPart(scramblerPart2)
+      scramblerParts.forEach(ScramblerPart => {
+        scrambler.addScramblerPart(new ScramblerPart())
+      })
 
       const encoderFileContent = scrambler.toEncoderString()
       const encoderFileName = `test-Scrambler-encoder-${i}.js`
@@ -135,10 +124,10 @@ describe('Scrambler', () => {
       const decode = require('./${decoderFileName}')
 
       const string = ${JSON.stringify(string)}
-      const cipher = ${JSON.stringify(cipher)}
+      const password = ${JSON.stringify(password)}
 
-      const encodedString = encode(string, cipher)
-      const decodedString = decode(encodedString, cipher)
+      const encodedString = encode(string, password)
+      const decodedString = decode(encodedString, password)
 
       console.log(decodedString)
       `
@@ -149,9 +138,28 @@ describe('Scrambler', () => {
 
       const output = execSync(`node ${file}`).toString().slice(0, -1)
 
-      cleanupTmpDirectory()
-
       expect(output).to.be.equal(string)
+
+      cleanupTmpDirectory()
     }
+  })
+})
+
+describe('tournament', () => {
+
+  it('should return a Scrambler', () => {
+    const config = {
+      minimumStringLength: 10,
+      minimumPasswordLength: 8,
+      complexity: 6,
+      reproductionParentsCount: 3,
+      reproductionChildrenCount: 6,
+      mutationFactor: 0.33,
+      generationsCount: 3,
+    }
+
+    const scrambler = tournament(config)
+
+    expect(scrambler.constructor).to.be.equal(Scrambler)
   })
 })

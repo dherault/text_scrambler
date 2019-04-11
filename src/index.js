@@ -11,13 +11,11 @@ Maintenant je suis captif. Mon corps est aux fers dans un cachot, mon esprit est
 const testPassword = 'password123'
 
 const scrambler = tournament({
-  minimumStringLength: testString.length,
-  minimumPasswordLength: testPassword.length,
   complexity: 12,
   reproductionParentsCount: 3,
   reproductionChildrenCount: 6,
   mutationFactor: 0.33,
-  generationsCount: 20,
+  generationsCount: 5,
 })
 
 console.log(scrambler)
@@ -29,13 +27,17 @@ const file = tmp.fileSync({
 
 fs.writeFileSync(file.name, `
 ${scrambler.toEncoderString()}
-${scrambler.toDecoderString(false)}
+${scrambler.toDecoderString(true)}
 
 const string = ${JSON.stringify(testString)}
-const cipher = ${JSON.stringify(testPassword)}
-const encoded = encode(string, cipher)
-console.log(encoded)
+const password = ${JSON.stringify(testPassword)}
+const encoded = encode(string, password)
 
+console.log('original:')
+console.log(string)
+console.log()
+console.log('encoded:')
+console.log(encoded)
 console.log()
 console.log('password123')
 console.log(decode(encoded, 'password123'))

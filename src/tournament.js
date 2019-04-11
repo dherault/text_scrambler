@@ -80,7 +80,7 @@ function evolve(config, scramblers) {
     for (let i = Math.floor(config.complexity * config.mutationFactor); i >= 0; i--) {
       const ScramblerPart = randomArray(scramblerParts)
 
-      mutations.push(new ScramblerPart(config))
+      mutations.push(new ScramblerPart())
     }
 
     const indexes = child.scramblerParts.map((scramblerPart, i) => i)
@@ -115,8 +115,8 @@ function addScoreToScramblers(scramblers) {
     ${scrambler.toEncoderString()}
 
     const string = ${JSON.stringify(testString)}
-    const cipher = ${JSON.stringify(testPassword)}
-    console.log(encode(string, cipher))
+    const password = ${JSON.stringify(testPassword)}
+    console.log(encode(string, password))
     `)
 
     // console.log(scrambler)
