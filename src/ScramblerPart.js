@@ -50,7 +50,7 @@ class CharacterSwapperScramblerPart {
 
   writeFinalTuples() {
     return `
-    const masterTuples = ${JSON.stringify(this.tuples)}.map(tuple => tuple.map(d => Math.floor(string.length * d))
+    const masterTuples = ${JSON.stringify(this.tuples)}.map(tuple => tuple.map(d => Math.floor(string.length * d)))
     const passwordIndexes = password.split('').map(char => dependencies.characters.indexOf(char))
     const minPasswordIndex = Math.min(...passwordIndexes)
     const tuplesIndexes = [...(new Set(passwordIndexes.map(index => index - minPasswordIndex)))]
@@ -117,29 +117,6 @@ class InverseStringScramblerPart {
   }
 }
 
-class InverseStringFromMiddleScramblerPart {
-  toEncoderString(functionName) {
-    return `
-    function ${functionName}(dependencies, string, password) {
-      const array = string.split('')
-      const middle = Math.floor(array.length / 2)
-      const score = dependencies.computeStringScore(dependencies, password).toString()
-      const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
-
-      for (let i = Math.floor(array.length / 2); i >= 0; i -= step) {
-        [array[i], array[array.length - i]] = [array[array.length - i], array[i]]
-      }
-
-      return array.join('')
-    }
-    `
-  }
-
-  toDecoderString(functionName) {
-    return this.toEncoderString(functionName)
-  }
-}
-
 class CharacterOffseterScramblerPart {
 
   constructor() {
@@ -194,6 +171,5 @@ module.exports = [
   CharactersAdderScramblerPart,
   CharacterSwapperScramblerPart,
   InverseStringScramblerPart,
-  InverseStringFromMiddleScramblerPart,
   CharacterOffseterScramblerPart,
 ]
