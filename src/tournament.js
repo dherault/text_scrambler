@@ -4,12 +4,12 @@ const tmp = require('tmp')
 const levenshtein = require('js-levenshtein')
 const Scrambler = require('./Scrambler')
 const scramblerParts = require('./ScramblerPart')
-const characters = require('./characters')
 const { randomArray, randomPop, randomRange, computeStringEntropy } = require('./utils')
 
 const scramblerDiversity = {}
 
-characters
+'abcdefghijklmnopqrstuvwxyz'
+.split('')
 .forEach((char, i) => {
   if (scramblerParts[i]) {
     scramblerDiversity[scramblerParts[i].name] = char

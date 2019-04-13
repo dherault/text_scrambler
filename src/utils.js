@@ -14,6 +14,7 @@ function computeStringEntropy(string) {
   const occurences = {}
   const l = string.length
 
+  // eslint-disable-next-line
   for (const char of string) {
     if (typeof occurences[char] === 'undefined') {
       occurences[char] = 1
@@ -32,8 +33,8 @@ function computeStringEntropy(string) {
   return h
 }
 
-function computeStringScore(dependencies, string) {
-  return string.split('').map((char, i) => i * dependencies.characters.indexOf(char)).reduce((a, b) => a + b, 0)
+function computeStringScore(string) {
+  return string.split('').map((char, i) => i * char.codePointAt(0)).reduce((a, b) => a + b, 0)
 }
 
 module.exports = {

@@ -56,19 +56,14 @@ describe('ScramblerPart', () => {
       it('should encore and decode a string given a password', () => {
 
         for (let i = 0; i < strings.length; i++) {
-          for (let j = 0; j < 10; j++) {
+          for (let j = 0; j < 3; j++) {
             const string = strings[i]
             const scramblerPart = new ScramblerPart()
 
-            const fileContent = `
+            const fileContent = `\
             ${dependenciesString}
             const password = ${JSON.stringify(password)}
             const string = ${JSON.stringify(string)}
-            for (const char of string) {
-              if (!dependencies.characters.includes(char)) {
-                dependencies.characters.push(char)
-              }
-            }
             ${scramblerPart.toEncoderString('encode')}
             ${scramblerPart.toDecoderString('decode')}
             const encodedString = encode(dependencies, string, password)
@@ -93,7 +88,7 @@ describe('ScramblerPart', () => {
   })
 })
 
-describe.only('Scrambler', () => {
+describe('Scrambler', () => {
 
   const password = 'password'
 
@@ -119,7 +114,7 @@ describe.only('Scrambler', () => {
 
       fs.writeFileSync(decoderFile, decoderFileContent)
 
-      const fileContent = `
+      const fileContent = `\
       const encode = require('./${encoderFileName}')
       const decode = require('./${decoderFileName}')
 

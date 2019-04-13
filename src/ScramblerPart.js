@@ -1,16 +1,20 @@
 const { randomRange } = require('./utils')
-const characters = require('./characters')
 
 class CharactersAdderScramblerPart {
+
+  printCommonCode() {
+    return `\
+    const score = dependencies.computeStringScore(password).toString()
+    const step = Math.floor((parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))) / 2)
+    `
+  }
 
   toEncoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      const score = dependencies.computeStringScore(dependencies, password).toString()
-      const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
-
+      ${this.printCommonCode()}
       for (let i = 0; i < string.length; i += step) {
-        string = string.slice(0, i) + dependencies.randomArray(dependencies.characters) + string.slice(i)
+        string = string.slice(0, i) + String.fromCodePoint(dependencies.randomRange(0, 65535)) + string.slice(i)
       }
 
       return string
@@ -21,9 +25,7 @@ class CharactersAdderScramblerPart {
   toDecoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      const score = dependencies.computeStringScore(dependencies, password).toString()
-      const step = parseInt(score.charAt(0)) + parseInt(score.charAt(score.length - 1))
-
+      ${this.printCommonCode()}
       for (let i = 0; i < string.length; i += step - 1) {
         string = string.slice(0, i) + string.slice(i + 1)
       }
@@ -48,14 +50,15 @@ class CharacterSwapperScramblerPart {
     }
   }
 
-  writeFinalTuples() {
-    return `
+  printCommonCode() {
+    return `\
     const masterTuples = ${JSON.stringify(this.tuples)}.map(tuple => tuple.map(d => Math.floor(string.length * d)))
-    const passwordIndexes = password.split('').map(char => dependencies.characters.indexOf(char))
+    const passwordIndexes = password.split('').map(char => char.codePointAt(0))
     const minPasswordIndex = Math.min(...passwordIndexes)
     const tuplesIndexes = [...(new Set(passwordIndexes.map(index => index - minPasswordIndex)))]
     const tuples = tuplesIndexes.map(index => masterTuples[index]).filter(tuple => tuple)
     const finalTuples = [...tuples]
+    const array = string.split('')
 
     for (let i = 0; i < string.length; i++) {
       finalTuples.push(...tuples.map(([i1, i2]) => [
@@ -69,10 +72,7 @@ class CharacterSwapperScramblerPart {
   toEncoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      ${this.writeFinalTuples()}
-
-      const array = string.split('')
-
+      ${this.printCommonCode()}
       for (let i = 0; i < finalTuples.length; i++) {
         const [i1, i2] = finalTuples[i]
 
@@ -87,10 +87,7 @@ class CharacterSwapperScramblerPart {
   toDecoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      ${this.writeFinalTuples()}
-
-      const array = string.split('')
-
+      ${this.printCommonCode()}
       for (let i = finalTuples.length - 1; i >= 0; i--) {
         const [i1, i2] = finalTuples[i]
 
@@ -120,24 +117,23 @@ class InverseStringScramblerPart {
 class CharacterOffseterScramblerPart {
 
   constructor() {
-    this.seed = randomRange(0, characters.length - 1)
+    this.seed = randomRange(1, 65535)
   }
 
   toEncoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      const l = dependencies.characters.length
-      const passwordOffsets = password.split('').map(char => dependencies.characters.indexOf(char))
+      const passwordOffsets = password.split('').map(char => char.codePointAt(0))
 
       return string
       .split('')
       .map((char, i) => {
         const offset = ${this.seed} + passwordOffsets[i % (passwordOffsets.length - 1)]
-        let offsetedIndex = dependencies.characters.indexOf(char) + offset
+        let nextCodePoint = char.codePointAt(0) + offset
 
-        if (offsetedIndex >= l) offsetedIndex %= l
+        if (nextCodePoint > 65535) nextCodePoint %= 65535
 
-        return dependencies.characters[offsetedIndex]
+        return String.fromCodePoint(nextCodePoint)
       })
       .join('')
     }
@@ -147,19 +143,17 @@ class CharacterOffseterScramblerPart {
   toDecoderString(functionName) {
     return `
     function ${functionName}(dependencies, string, password) {
-      const l = dependencies.characters.length
-      const passwordOffsets = password.split('').map(char => dependencies.characters.indexOf(char))
+      const passwordOffsets = password.split('').map(char => char.codePointAt(0))
 
       return string
       .split('')
       .map((char, i) => {
         const offset = ${this.seed} + passwordOffsets[i % (passwordOffsets.length - 1)]
-        let offsetedIndex = dependencies.characters.indexOf(char) - offset
+        let nextCodePoint = char.codePointAt(0) - offset
 
-        if (offsetedIndex < 0) offsetedIndex = l + offsetedIndex % l
-        if (offsetedIndex >= l) offsetedIndex %= l
+        if (nextCodePoint < 0) nextCodePoint += 65535
 
-        return dependencies.characters[offsetedIndex]
+        return String.fromCodePoint(nextCodePoint)
       })
       .join('')
     }
