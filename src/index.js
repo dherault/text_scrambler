@@ -11,7 +11,11 @@ const defaultOptions = {
 function generateScrambler(useroptions) {
   const options = Object.assign({}, defaultOptions, useroptions)
 
-  return tournament(options)
+  const scrambler = tournament(options)
+
+  // TODO: encode and decode files
+  // TODO: rename the lib
+  return scrambler
 }
 
 module.exports = generateScrambler

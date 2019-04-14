@@ -1,6 +1,6 @@
 {
-  "name": "text_scrambler",
-  "version": "0.0.0",
+  "name": "text-scrambler",
+  "version": "1.0.0",
   "description": "Genetically-generated text scrambling algorithms",
   "main": "src/index.js",
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",

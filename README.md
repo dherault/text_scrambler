@@ -1,2 +1,3 @@
-# text_scrambler
-Genetically-generated text scrambling algorithms
+# Text Scrambler
+
+Genetically-generated text-scrambling algorithms
