@@ -11,7 +11,7 @@ Maintenant je suis captif. Mon corps est aux fers dans un cachot, mon esprit est
 const testPassword = 'password123'
 
 const scrambler = tournament({
-  complexity: 12,
+  complexity: 6,
   reproductionParentsCount: 3,
   reproductionChildrenCount: 6,
   mutationFactor: 0.33,
