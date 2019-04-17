@@ -41,6 +41,7 @@
     "padded-blocks": "off",
     "radix": "off",
     "semi": ["error", "never"],
+    "space-infix-ops": "error",
     "import/no-cycle": "off",
     "jsx-a11y/alt-text": "off",
     "jsx-a11y/click-events-have-key-events": "off",
